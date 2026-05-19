@@ -26,8 +26,9 @@ enum StatusGridImageRenderer {
             return "AI usage loading"
         }
 
+        let now = Date()
         return usages.map { usage in
-            "\(usage.compactProviderLabel) \(usage.displayName) \(usage.fiveHourDisplayText), \(usage.weeklyDisplayText)"
+            "\(usage.compactProviderLabel) \(usage.displayName) resets in \(usage.fiveHourResetCountdownText(now: now)), \(usage.fiveHourDisplayText), \(usage.weeklyDisplayText)"
         }.joined(separator: "; ")
     }
 
@@ -47,6 +48,7 @@ enum StatusGridImageRenderer {
             return
         }
 
+        let now = Date()
         for (index, usage) in usages.enumerated() {
             let x = CGFloat(index) * columnWidth
             let columnRect = NSRect(x: x, y: 0, width: columnWidth, height: bounds.height)
@@ -55,10 +57,17 @@ enum StatusGridImageRenderer {
             drawProviderStripe(for: usage, in: columnRect)
             drawText(
                 usage.compactProviderCode,
-                in: NSRect(x: x, y: 5, width: providerCodeWidth, height: 13),
+                in: NSRect(x: x, y: 12, width: providerCodeWidth, height: 11),
                 color: .labelColor,
                 alignment: .right,
                 font: .monospacedSystemFont(ofSize: 10.5, weight: .bold)
+            )
+            drawText(
+                usage.fiveHourResetCountdownText(now: now),
+                in: NSRect(x: x, y: 1, width: providerCodeWidth, height: 10),
+                color: .secondaryLabelColor,
+                alignment: .right,
+                font: .monospacedSystemFont(ofSize: 7.5, weight: .medium)
             )
             drawText(
                 format(usage.fiveHourRemainingPercent),

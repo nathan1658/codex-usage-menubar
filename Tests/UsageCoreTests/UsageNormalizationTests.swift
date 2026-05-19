@@ -145,6 +145,79 @@ final class UsageNormalizationTests: XCTestCase {
         XCTAssertEqual(usage.weeklyDisplayText, "1w 88%")
     }
 
+    func testFiveHourResetCountdownFloorsToHoursWhenAtLeastOneHourRemains() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let usage = ProviderAccountUsage(
+            provider: .codex,
+            accountID: "main",
+            displayName: "main",
+            fiveHourUsedPercent: 33,
+            weeklyUsedPercent: 12,
+            fiveHourResetAt: now.addingTimeInterval((4 * 60 * 60) + (30 * 60)),
+            weeklyResetAt: nil,
+            planName: nil,
+            errorMessage: nil,
+            updatedAt: now
+        )
+
+        XCTAssertEqual(usage.fiveHourResetCountdownText(now: now), "4h")
+    }
+
+    func testFiveHourResetCountdownFloorsToMinutesWhenUnderOneHourRemains() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let usage = ProviderAccountUsage(
+            provider: .claude,
+            accountID: "main",
+            displayName: "main",
+            fiveHourUsedPercent: 33,
+            weeklyUsedPercent: 12,
+            fiveHourResetAt: now.addingTimeInterval(30 * 60),
+            weeklyResetAt: nil,
+            planName: nil,
+            errorMessage: nil,
+            updatedAt: now
+        )
+
+        XCTAssertEqual(usage.fiveHourResetCountdownText(now: now), "30m")
+    }
+
+    func testFiveHourResetCountdownUsesNowForExpiredOrSubMinuteReset() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let usage = ProviderAccountUsage(
+            provider: .claudeRelay,
+            accountID: "relay",
+            displayName: "relay",
+            fiveHourUsedPercent: 33,
+            weeklyUsedPercent: 12,
+            fiveHourResetAt: now.addingTimeInterval(59),
+            weeklyResetAt: nil,
+            planName: nil,
+            errorMessage: nil,
+            updatedAt: now
+        )
+
+        XCTAssertEqual(usage.fiveHourResetCountdownText(now: now), "now")
+        XCTAssertEqual(usage.fiveHourResetCountdownText(now: now.addingTimeInterval(60)), "now")
+    }
+
+    func testFiveHourResetCountdownUsesQuestionMarkWhenResetTimeIsMissing() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let usage = ProviderAccountUsage(
+            provider: .claudeRelay,
+            accountID: "relay",
+            displayName: "relay",
+            fiveHourUsedPercent: 33,
+            weeklyUsedPercent: 12,
+            fiveHourResetAt: nil,
+            weeklyResetAt: nil,
+            planName: nil,
+            errorMessage: nil,
+            updatedAt: now
+        )
+
+        XCTAssertEqual(usage.fiveHourResetCountdownText(now: now), "?")
+    }
+
     func testConfigurationDecodesMultipleProviderAccounts() throws {
         let json = """
         {

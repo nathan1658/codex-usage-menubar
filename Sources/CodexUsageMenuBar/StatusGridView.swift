@@ -31,12 +31,14 @@ final class StatusGridView: NSView {
             return
         }
 
+        let now = Date()
         for (index, usage) in usages.enumerated() {
             let x = CGFloat(index) * columnWidth
             let columnRect = NSRect(x: x, y: 0, width: columnWidth, height: bounds.height)
             drawProviderStripe(for: usage, in: columnRect)
 
-            let labelRect = NSRect(x: x, y: 5, width: providerCodeWidth, height: 13)
+            let labelRect = NSRect(x: x, y: 2, width: providerCodeWidth, height: 10)
+            let resetRect = NSRect(x: x, y: 13, width: providerCodeWidth, height: 10)
             let valueX = x + providerCodeWidth + valueGap
             let topRect = NSRect(x: valueX, y: 2, width: valueWidth, height: 10)
             let bottomRect = NSRect(x: valueX, y: 13, width: valueWidth, height: 10)
@@ -47,6 +49,13 @@ final class StatusGridView: NSView {
                 color: .labelColor,
                 alignment: .right,
                 font: .monospacedSystemFont(ofSize: 10.5, weight: .bold)
+            )
+            drawText(
+                usage.fiveHourResetCountdownText(now: now),
+                in: resetRect,
+                color: .secondaryLabelColor,
+                alignment: .right,
+                font: .monospacedSystemFont(ofSize: 7.5, weight: .medium)
             )
             drawText(
                 format(usage.fiveHourRemainingPercent),

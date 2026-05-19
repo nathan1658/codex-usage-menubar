@@ -8,13 +8,14 @@ The menu-bar item renders one compact column per configured account:
 
 ```text
 Cx 67  C1 75  C2 99
-   88     90     98
+4h 88 30m 90  2h 98
 ```
 
-Each account column has one provider label and two stacked remaining-quota values:
+Each account column has one provider label, its floor-rounded 5h reset countdown, and two stacked remaining-quota values:
 
 - Top value: 5h remaining quota
 - Bottom value: 1w remaining quota
+- Bottom-left value: time until the 5h counter resets, rounded down to one unit (`4h30m` shows as `4h`; `30m` shows as `30m`)
 - `Cx`: Codex
 - `C1`: Claude Code / Anthropic OAuth usage
 - `C2`: Claude relay endpoint

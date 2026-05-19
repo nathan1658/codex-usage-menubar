@@ -81,6 +81,10 @@ public struct ProviderAccountUsage: Equatable, Sendable {
         remainingPercent(from: weeklyUsedPercent)
     }
 
+    public func fiveHourResetCountdownText(now: Date = Date()) -> String {
+        resetCountdownText(until: fiveHourResetAt, now: now)
+    }
+
     public var compactProviderCode: String {
         switch provider {
         case .codex:
@@ -116,6 +120,25 @@ public struct ProviderAccountUsage: Equatable, Sendable {
             return nil
         }
         return 100 - usedPercent.clamped(to: 0...100)
+    }
+
+    private func resetCountdownText(until resetAt: Date?, now: Date) -> String {
+        guard let resetAt else {
+            return "?"
+        }
+
+        let remainingSeconds = max(0, Int(resetAt.timeIntervalSince(now)))
+        let remainingMinutes = remainingSeconds / 60
+        if remainingMinutes < 1 {
+            return "now"
+        }
+
+        let remainingHours = remainingMinutes / 60
+        if remainingHours >= 1 {
+            return "\(remainingHours)h"
+        }
+
+        return "\(remainingMinutes)m"
     }
 
     public func withError(_ message: String, updatedAt: Date = Date()) -> ProviderAccountUsage {

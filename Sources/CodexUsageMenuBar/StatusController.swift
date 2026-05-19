@@ -148,7 +148,7 @@ final class StatusController: NSObject {
         }
 
         return usages.map { usage in
-            "\(usage.compactProviderLabel) \(usage.displayName): \(usage.fiveHourDisplayText), \(usage.weeklyDisplayText)"
+            "\(usage.compactProviderLabel) \(usage.displayName): resets in \(usage.fiveHourResetCountdownText()), \(usage.fiveHourDisplayText), \(usage.weeklyDisplayText)"
         }.joined(separator: "\n")
     }
 
