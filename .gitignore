@@ -1,0 +1,13 @@
+.DS_Store
+.build/
+.swiftpm/
+Package.resolved
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Local runtime/config data. Keep private provider IDs and tokens out of Git.
+.env
+.env.*
+config.json
+*.log

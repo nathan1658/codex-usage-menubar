@@ -1,0 +1,32 @@
+{
+  "refreshSeconds": 300,
+  "accounts": [
+    {
+      "provider": "codex",
+      "label": "main",
+      "codexHome": "~/.codex"
+    },
+    {
+      "provider": "codex",
+      "label": "pooi",
+      "codexHome": "~/.codex/homes/pooi"
+    },
+    {
+      "provider": "codex",
+      "label": "wai",
+      "codexHome": "~/.codex/homes/wai"
+    },
+    {
+      "provider": "claude",
+      "label": "main",
+      "claudeHome": "~/.claude"
+    },
+    {
+      "provider": "claudeRelay",
+      "label": "relay",
+      "relayApiID": "your-relay-api-id",
+      "relayStatsURL": "https://relay.example.com/apiStats/api/user-stats",
+      "relayReferrer": "https://relay.example.com/admin-next/api-stats?apiId=your-relay-api-id"
+    }
+  ]
+}
