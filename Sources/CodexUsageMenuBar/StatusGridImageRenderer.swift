@@ -65,9 +65,9 @@ enum StatusGridImageRenderer {
             drawText(
                 usage.fiveHourResetCountdownText(now: now),
                 in: NSRect(x: x, y: 1, width: providerCodeWidth, height: 10),
-                color: .secondaryLabelColor,
+                color: .labelColor,
                 alignment: .right,
-                font: .monospacedSystemFont(ofSize: 7.5, weight: .medium)
+                font: .monospacedSystemFont(ofSize: 10.5, weight: .bold)
             )
             drawText(
                 format(usage.fiveHourRemainingPercent),

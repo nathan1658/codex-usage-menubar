@@ -53,9 +53,9 @@ final class StatusGridView: NSView {
             drawText(
                 usage.fiveHourResetCountdownText(now: now),
                 in: resetRect,
-                color: .secondaryLabelColor,
+                color: .labelColor,
                 alignment: .right,
-                font: .monospacedSystemFont(ofSize: 7.5, weight: .medium)
+                font: .monospacedSystemFont(ofSize: 10.5, weight: .bold)
             )
             drawText(
                 format(usage.fiveHourRemainingPercent),
