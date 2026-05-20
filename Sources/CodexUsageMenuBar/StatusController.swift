@@ -1,5 +1,6 @@
 import AppKit
 import UsageCore
+import WidgetKit
 
 @MainActor
 final class StatusController: NSObject {
@@ -81,6 +82,7 @@ final class StatusController: NSObject {
 
     private func updateGrid(with usages: [ProviderAccountUsage]) {
         latestUsages = usages
+        writeWidgetSnapshot(for: usages)
 
         if let button = statusItem.button {
             let image = StatusGridImageRenderer.image(for: usages, appearance: button.effectiveAppearance)
@@ -90,6 +92,18 @@ final class StatusController: NSObject {
             button.toolTip = tooltip(for: usages)
             button.setAccessibilityLabel(StatusGridImageRenderer.accessibilityLabel(for: usages))
         }
+    }
+
+    private func writeWidgetSnapshot(for usages: [ProviderAccountUsage]) {
+        guard !usages.isEmpty else {
+            return
+        }
+
+        guard (try? CodexUsageWidgetSnapshot(usages: usages).writeForWidgetExtension()) != nil else {
+            return
+        }
+
+        WidgetCenter.shared.reloadTimelines(ofKind: CodexUsageWidgetSnapshot.widgetKind)
     }
 
     private func makeMenu() -> NSMenu {

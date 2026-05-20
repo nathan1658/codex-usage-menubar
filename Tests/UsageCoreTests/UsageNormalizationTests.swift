@@ -218,6 +218,118 @@ final class UsageNormalizationTests: XCTestCase {
         XCTAssertEqual(usage.fiveHourResetCountdownText(now: now), "?")
     }
 
+    func testWidgetSnapshotMapsUsageRowsForDisplay() throws {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let usage = ProviderAccountUsage(
+            provider: .claude,
+            accountID: "main",
+            displayName: "main",
+            fiveHourUsedPercent: 84,
+            weeklyUsedPercent: 15,
+            fiveHourResetAt: now.addingTimeInterval(90 * 60),
+            weeklyResetAt: nil,
+            planName: nil,
+            errorMessage: nil,
+            updatedAt: now
+        )
+
+        let snapshot = CodexUsageWidgetSnapshot(usages: [usage], now: now)
+
+        XCTAssertEqual(snapshot.accounts.count, 1)
+        XCTAssertEqual(snapshot.accounts[0].id, "main")
+        XCTAssertEqual(snapshot.accounts[0].providerCode, "C1")
+        XCTAssertEqual(snapshot.accounts[0].displayName, "main")
+        XCTAssertEqual(snapshot.accounts[0].fiveHourRemainingPercent, 16)
+        XCTAssertEqual(snapshot.accounts[0].weeklyRemainingPercent, 85)
+        XCTAssertEqual(snapshot.accounts[0].fiveHourResetText, "1h")
+        XCTAssertEqual(snapshot.accounts[0].providerColorKey, "claude")
+        XCTAssertEqual(snapshot.accounts[0].hasError, false)
+    }
+
+    func testWidgetSnapshotChoosesTightestFiveHourAccount() throws {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let codex = ProviderAccountUsage(
+            provider: .codex,
+            accountID: "codex",
+            displayName: "codex",
+            fiveHourUsedPercent: 20,
+            weeklyUsedPercent: 10,
+            fiveHourResetAt: now.addingTimeInterval(4 * 60 * 60),
+            weeklyResetAt: nil,
+            planName: nil,
+            errorMessage: nil,
+            updatedAt: now
+        )
+        let claude = ProviderAccountUsage(
+            provider: .claude,
+            accountID: "claude",
+            displayName: "claude",
+            fiveHourUsedPercent: 91,
+            weeklyUsedPercent: 10,
+            fiveHourResetAt: now.addingTimeInterval(60 * 60),
+            weeklyResetAt: nil,
+            planName: nil,
+            errorMessage: nil,
+            updatedAt: now
+        )
+
+        let snapshot = CodexUsageWidgetSnapshot(usages: [codex, claude], now: now)
+
+        XCTAssertEqual(snapshot.tightestAccount?.providerCode, "C1")
+        XCTAssertEqual(snapshot.tightestAccount?.fiveHourRemainingPercent, 9)
+    }
+
+    func testWidgetSnapshotRoundTripsThroughJSON() throws {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let snapshot = CodexUsageWidgetSnapshot(
+            updatedAt: now,
+            accounts: [
+                .init(
+                    id: "codex:main",
+                    providerCode: "Cx",
+                    displayName: "main",
+                    fiveHourRemainingPercent: 67,
+                    weeklyRemainingPercent: 88,
+                    fiveHourResetText: "4h",
+                    providerColorKey: "codex",
+                    hasError: false
+                )
+            ]
+        )
+
+        let data = try JSONEncoder().encode(snapshot)
+        let decoded = try JSONDecoder().decode(CodexUsageWidgetSnapshot.self, from: data)
+
+        XCTAssertEqual(decoded, snapshot)
+    }
+
+    func testWidgetSnapshotWritesAndReadsFile() throws {
+        let snapshot = CodexUsageWidgetSnapshot(
+            updatedAt: Date(timeIntervalSince1970: 1_000),
+            accounts: [
+                .init(
+                    id: "relay:main",
+                    providerCode: "C2",
+                    displayName: "relay",
+                    fiveHourRemainingPercent: 99,
+                    weeklyRemainingPercent: 98,
+                    fiveHourResetText: "2h",
+                    providerColorKey: "relay",
+                    hasError: false
+                )
+            ]
+        )
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("json")
+
+        try snapshot.write(to: url)
+        let decoded = try CodexUsageWidgetSnapshot.read(from: url)
+
+        XCTAssertEqual(decoded, snapshot)
+        try? FileManager.default.removeItem(at: url)
+    }
+
     func testConfigurationDecodesMultipleProviderAccounts() throws {
         let json = """
         {

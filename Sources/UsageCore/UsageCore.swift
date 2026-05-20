@@ -81,6 +81,17 @@ public struct ProviderAccountUsage: Equatable, Sendable {
         remainingPercent(from: weeklyUsedPercent)
     }
 
+    public var widgetProviderColorKey: String {
+        switch provider {
+        case .codex:
+            return "codex"
+        case .claude:
+            return "claude"
+        case .claudeRelay:
+            return "relay"
+        }
+    }
+
     public func fiveHourResetCountdownText(now: Date = Date()) -> String {
         resetCountdownText(until: fiveHourResetAt, now: now)
     }
@@ -393,4 +404,24 @@ private func parseISODate(_ value: String?) -> Date? {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [.withInternetDateTime]
     return formatter.date(from: value)
+}
+
+public extension CodexUsageWidgetSnapshot {
+    init(usages: [ProviderAccountUsage], now: Date = Date()) {
+        self.init(
+            updatedAt: now,
+            accounts: usages.map { usage in
+                Account(
+                    id: usage.accountID,
+                    providerCode: usage.compactProviderCode,
+                    displayName: usage.displayName,
+                    fiveHourRemainingPercent: usage.fiveHourRemainingPercent,
+                    weeklyRemainingPercent: usage.weeklyRemainingPercent,
+                    fiveHourResetText: usage.fiveHourResetCountdownText(now: now),
+                    providerColorKey: usage.widgetProviderColorKey,
+                    hasError: usage.errorMessage != nil
+                )
+            }
+        )
+    }
 }

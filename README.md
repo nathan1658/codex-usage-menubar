@@ -30,6 +30,12 @@ Remaining values are color-coded:
 
 Click the menu-bar item to open a dropdown with account names, reset times, plan names when available, last refresh errors, and a manual refresh action.
 
+## macOS Widget
+
+The installer also bundles an `AI Usage` WidgetKit extension. After installing, add it from macOS Edit Widgets / Notification Center. macOS does not expose third-party widgets inside Control Center itself, so the widget is available in the normal widget surfaces: Notification Center and desktop widgets.
+
+The small widget highlights the account with the least 5h quota remaining. Medium and large widgets show all configured accounts with 5h remaining quota, 1w remaining quota, and the floor-rounded 5h reset time.
+
 ## Supported Providers
 
 ### Codex
@@ -102,6 +108,7 @@ The installer:
 
 - Builds a release binary
 - Packages it as a menu-bar-only app at `~/Applications/CodexUsageMenuBar.app`
+- Bundles the `AI Usage` WidgetKit extension inside the app
 - Installs a LaunchAgent at `~/Library/LaunchAgents/com.nathancheng.codex-usage-menubar.plist`
 - Starts or restarts the menu-bar app
 
@@ -217,6 +224,7 @@ The project is a Swift Package with:
 
 - `Sources/UsageCore`: provider models, normalization, and response parsers
 - `Sources/CodexUsageMenuBar`: macOS app, menu-bar rendering, provider clients, config loading
+- `Sources/CodexUsageWidget`: WidgetKit extension UI
 - `Tests/UsageCoreTests`: parser and normalization tests
 - `scripts/`: LaunchAgent install and uninstall scripts
 
