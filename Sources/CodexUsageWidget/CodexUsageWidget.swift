@@ -76,7 +76,7 @@ struct SmallUsageWidget: View {
 
     var body: some View {
         if let account = snapshot.tightestAccount {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 HeaderRow(title: "AI", updatedAt: snapshot.updatedAt)
 
                 Spacer(minLength: 0)
@@ -90,11 +90,11 @@ struct SmallUsageWidget: View {
                         .monospacedDigit()
                 }
 
-                HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
                     Label(account.fiveHourResetText, systemImage: "clock")
-                    Text("1w \(percentText(account.weeklyRemainingPercent))")
+                    Text(weeklyText(account.weeklyRemainingPercent))
                 }
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(.secondary)
 
                 QuotaBar(percent: account.fiveHourRemainingPercent, color: riskColor(account.fiveHourRemainingPercent))
@@ -188,7 +188,7 @@ struct AccountColumn: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("reset \(account.fiveHourResetText)")
-                Text("1w \(percentText(account.weeklyRemainingPercent))")
+                Text(weeklyText(account.weeklyRemainingPercent))
             }
             .font(.system(size: 10, weight: .semibold, design: .rounded))
             .foregroundStyle(.secondary)
@@ -232,7 +232,7 @@ struct FocusAccountPanel: View {
 
             HStack(spacing: 10) {
                 Label(account.fiveHourResetText, systemImage: "clock")
-                Text("1w \(percentText(account.weeklyRemainingPercent))")
+                Text(weeklyText(account.weeklyRemainingPercent))
             }
             .font(.system(size: 11, weight: .semibold, design: .rounded))
             .foregroundStyle(.secondary)
@@ -270,7 +270,7 @@ struct AccountRow: View {
                         .font(.system(size: 20, weight: .black, design: .rounded))
                         .foregroundStyle(riskColor(account.fiveHourRemainingPercent))
                         .monospacedDigit()
-                    Text("1w \(percentText(account.weeklyRemainingPercent))")
+                    Text(weeklyText(account.weeklyRemainingPercent))
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
@@ -316,6 +316,14 @@ struct QuotaBar: View {
 
 private func percentText(_ percent: Int?) -> String {
     percent.map(String.init) ?? "?"
+}
+
+private func percentLabel(_ percent: Int?) -> String {
+    percent.map { "\($0)%" } ?? "?"
+}
+
+private func weeklyText(_ percent: Int?) -> String {
+    "weekly \(percentLabel(percent))"
 }
 
 private func riskColor(_ percent: Int?) -> Color {
